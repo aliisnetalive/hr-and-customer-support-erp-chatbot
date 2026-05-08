@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 HR CHATBOT - PRODUCTION FLASK API v2.0
-Enterprise-grade REST API for HR Question Answering
-Part of NOVAERP - Egyptian ERP System
+Enterprise-grade REST API for HR Policy Question Answering
 """
 
 from __future__ import annotations
@@ -66,6 +65,7 @@ class LocalLLM:
     """LM Studio LLM Client"""
     def __init__(self, base_url: str, api_key: str, model: str, temperature: float = 0.3):
         import httpx
+        # Create client without proxies to avoid compatibility issues
         http_client = httpx.Client(timeout=90.0)
         self.client = OpenAIClient(base_url=base_url, api_key=api_key, http_client=http_client)
         self.model = model
@@ -74,7 +74,7 @@ class LocalLLM:
     def predict(self, prompt: str) -> str:
         """Generate response from LLM"""
         messages = [
-            {"role": "system", "content": "You are a professional HR Assistant. Answer based strictly on the provided context about HR policies, leave management, employee benefits, and company procedures."},
+            {"role": "system", "content": "You are a professional HR Assistant. Answer based strictly on the provided context."},
             {"role": "user", "content": prompt}
         ]
         try:
@@ -101,14 +101,14 @@ class EnterpriseHRChatbot:
         self.llm = None
         self.initialized = False
         
-        logger.info("Initializing HR Chatbot...")
+        logger.info("🤖 Initializing HR Chatbot...")
         try:
             self._ingest_documents()
             self._init_llm()
             self.initialized = True
-            logger.info("HR Chatbot initialized successfully!")
+            logger.info("✅ Chatbot initialized successfully!")
         except Exception as e:
-            logger.error(f"Initialization failed: {e}")
+            logger.error(f"❌ Initialization failed: {e}")
             raise
 
     def _ingest_documents(self):
@@ -119,7 +119,7 @@ class EnterpriseHRChatbot:
             if not Path(file_path).exists():
                 raise FileNotFoundError(f"PDF not found: {file_path}")
 
-            logger.info(f"Loading PDF: {file_path}")
+            logger.info(f"📄 Loading PDF: {file_path}")
             loader = PyPDFLoader(file_path)
             docs = loader.load()
             logger.info(f"   Loaded {len(docs)} pages")
@@ -128,7 +128,7 @@ class EnterpriseHRChatbot:
             docs = [d for d in docs if len(d.page_content) > 50]
             
             # Create chunks
-            logger.info("Creating chunks...")
+            logger.info("✂️  Creating chunks...")
             splitter = RecursiveCharacterTextSplitter(
                 chunk_size=self.config.document.chunk_size,
                 chunk_overlap=self.config.document.chunk_overlap
@@ -137,7 +137,7 @@ class EnterpriseHRChatbot:
             logger.info(f"   Created {len(chunks)} chunks")
             
             # Build vector index
-            logger.info("Building vector index...")
+            logger.info("🔍 Building vector index...")
             self.embeddings = HuggingFaceEmbeddings(
                 model_name=self.config.embedding.model
             )
@@ -150,7 +150,7 @@ class EnterpriseHRChatbot:
 
     def _init_llm(self):
         """Initialize LLM client"""
-        logger.info("Initializing LLM client...")
+        logger.info("🤖 Initializing LLM client...")
         self.llm = LocalLLM(
             base_url=self.config.lm_studio.base_url,
             api_key=self.config.lm_studio.api_key,
@@ -180,7 +180,7 @@ class EnterpriseHRChatbot:
             ])
             
             # Build prompt
-            prompt = f"""You are a helpful HR Assistant for an Egyptian ERP system. Answer the question based strictly on the context provided. Focus on HR policies, leave management, employee benefits, attendance rules, and company procedures.
+            prompt = f"""You are a helpful HR Assistant. Answer the question based strictly on the context provided.
 
 FORMATTING GUIDELINES:
 1. Start with a direct answer
@@ -220,7 +220,7 @@ ANSWER:"""
 # ============================================================================
 def create_app(config: Optional[SystemConfig] = None) -> Flask:
     """Create and configure Flask app"""
-    logger.info("create_app() called - creating Flask instance")
+    logger.info("📦 create_app() called - creating Flask instance")
     app = Flask(__name__)
     CORS(app)
     
@@ -228,17 +228,18 @@ def create_app(config: Optional[SystemConfig] = None) -> Flask:
         config = SystemConfig()
     
     # Initialize chatbot
-    logger.info("Attempting to initialize HR chatbot...")
+    logger.info("🔄 Attempting to initialize chatbot...")
     try:
         chatbot = EnterpriseHRChatbot(config)
-        logger.info(f"HR Chatbot object created: {chatbot}")
-        logger.info(f"chatbot.initialized = {chatbot.initialized}")
+        logger.info(f"✅ create_app(): Chatbot object created: {chatbot}")
+        logger.info(f"✅ create_app(): chatbot.initialized = {chatbot.initialized}")
     except Exception as e:
-        logger.error(f"Failed to initialize HR chatbot: {e}")
+        logger.error(f"❌ create_app(): Failed to initialize chatbot: {e}")
         import traceback
         logger.error(traceback.format_exc())
         chatbot = None
     
+    logger.info(f"📦 create_app(): Setting app.config['chatbot'] = {chatbot}")
     app.config['chatbot'] = chatbot
     app.config['system_config'] = config
     
@@ -251,6 +252,7 @@ def create_app(config: Optional[SystemConfig] = None) -> Flask:
         """Health check"""
         cb = app.config.get('chatbot')
         is_ready = cb is not None and getattr(cb, 'initialized', False)
+        logger.info(f"🏥 Health check: chatbot={cb is not None}, initialized={getattr(cb, 'initialized', 'N/A')}, ready={is_ready}")
         return jsonify({
             "status": "ok",
             "timestamp": datetime.now().isoformat(),
@@ -285,7 +287,7 @@ def create_app(config: Optional[SystemConfig] = None) -> Flask:
             if not question:
                 return jsonify({"error": "Question cannot be empty"}), 400
             
-            logger.info(f"Query: {question}")
+            logger.info(f"📥 Query: {question}")
             result = cb.query(question)
             
             return jsonify(result), 200 if result['success'] else 500
@@ -305,7 +307,7 @@ def create_app(config: Optional[SystemConfig] = None) -> Flask:
             if not question.strip():
                 return jsonify({"error": "Question cannot be empty"}), 400
             
-            logger.info(f"Query (GET): {question}")
+            logger.info(f"📥 Query (GET): {question}")
             result = cb.query(question)
             
             return jsonify(result), 200 if result['success'] else 500
@@ -346,9 +348,10 @@ if __name__ == '__main__':
         config = SystemConfig()
         app = create_app(config)
         
-        logger.info("Starting HR Chatbot Flask API Server...")
+        logger.info("🚀 Starting Flask API Server...")
         logger.info(f"   Host: {config.flask.host}:{config.flask.port}")
         logger.info(f"   PDF: {config.document.file_path}")
+        logger.info("")
         
         app.run(
             host=config.flask.host,

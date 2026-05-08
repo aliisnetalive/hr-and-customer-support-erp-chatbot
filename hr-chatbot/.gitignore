@@ -1,34 +1,16 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environment
-venv/
-env/
-.venv/
-
-# Environment variables
 .env
-
-# Log files
+.env.local
+venv/
+__pycache__/
+*.pyc
 *.log
-
-# PDF documents (user-specific)
-*.pdf
-
-# FAISS index files (generated at runtime)
-faiss_index/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
+*.tmp
 .DS_Store
 Thumbs.db
-
-# Model cache
-models/
+*.pdf
+faiss_index/
+.vscode/
+.idea/
+*.egg-info/
+build/
+dist/

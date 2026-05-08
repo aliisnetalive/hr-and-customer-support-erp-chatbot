@@ -26,7 +26,7 @@ class DocumentConfig(BaseModel):
     """Document Processing Configuration"""
     model_config = ConfigDict(validate_assignment=True)
     
-    file_path: str = os.getenv("FILE_PATH", "Egyptian_ERP_System_Comprehensive_Manual.pdf")
+    file_path: str = os.getenv("FILE_PATH", "Egyptian_HR_Policy_Manual_Complete.pdf")
     chunk_size: int = int(os.getenv("CHUNK_SIZE", "600"))
     chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "100"))
 
@@ -47,7 +47,7 @@ class FlaskConfig(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
     
     host: str = os.getenv("FLASK_HOST", "0.0.0.0")
-    port: int = int(os.getenv("FLASK_PORT", "5001"))
+    port: int = int(os.getenv("FLASK_PORT", "5000"))
     debug: bool = os.getenv("FLASK_DEBUG", "False").lower() == "true"
     threaded: bool = True
 

@@ -7,21 +7,21 @@ services:
       dockerfile: Dockerfile
     container_name: hr-chatbot-api
     ports:
-      - "5001:5001"
+      - "5000:5000"
     environment:
-      - FILE_PATH=Egyptian_ERP_System_Comprehensive_Manual.pdf
+      - FILE_PATH=Egyptian_HR_Policy_Manual_Complete.pdf
       - LM_STUDIO_BASE_URL=http://host.docker.internal:1234/v1
       - LM_STUDIO_API_KEY=lm-studio
       - LM_STUDIO_MODEL=llama-3.2-3b-instruct
       - TEMPERATURE=0.3
       - FLASK_HOST=0.0.0.0
-      - FLASK_PORT=5001
+      - FLASK_PORT=5000
       - FLASK_DEBUG=False
     volumes:
       - ./:/app
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3

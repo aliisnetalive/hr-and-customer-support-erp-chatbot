@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 HR Chatbot API - Test Client
-Interactive client to test the HR Chatbot API
+Interactive client to test the API
 """
 
 import requests
@@ -9,7 +9,7 @@ import json
 import sys
 from typing import Dict, Any
 
-API_BASE_URL = "http://localhost:5001"
+API_BASE_URL = "http://localhost:5000"
 
 class ChatbotAPIClient:
     """API client"""
@@ -64,21 +64,21 @@ def print_response(response: Dict[str, Any]):
 
 def main():
     """Main"""
-    print("\nHR CHATBOT API - TEST CLIENT\n")
+    print("\n🤖 HR CHATBOT API - TEST CLIENT\n")
     
     client = ChatbotAPIClient()
     
     # 1. Health check
-    print("1. Checking API Health...")
+    print("1️⃣  Checking API Health...")
     health = client.health_check()
     if health.get("status") == "ok":
-        print(f"API is healthy | Chatbot Ready: {health.get('chatbot_ready')}\n")
+        print(f"✅ API is healthy | Chatbot Ready: {health.get('chatbot_ready')}\n")
     else:
-        print(f"API Error: {health.get('error')}\n")
+        print(f"❌ API Error: {health.get('error')}\n")
         sys.exit(1)
     
     # 2. Config
-    print("2. Configuration:")
+    print("2️⃣  Configuration:")
     config = client.get_config()
     if "error" not in config:
         for key, value in config.items():
@@ -86,7 +86,7 @@ def main():
         print()
     
     # 3. Sample questions
-    print("3. Sample Questions:\n")
+    print("3️⃣  Sample Questions:\n")
     
     samples = [
         "What is the policy on sick leave?",
@@ -98,20 +98,20 @@ def main():
         print(f"Q: {question}")
         response = client.ask_question(question)
         if response.get("success"):
-            print(f"Answer: {response.get('answer', '')[:100]}...")
+            print(f"✅ Answer: {response.get('answer', '')[:100]}...")
         else:
-            print(f"Error: {response.get('error')}")
+            print(f"❌ Error: {response.get('error')}")
         print()
     
     # 4. Interactive
-    print("\n4. Interactive Mode (type 'quit' to exit)\n")
+    print("\n4️⃣  Interactive Mode (type 'quit' to exit)\n")
     
     while True:
         try:
-            question = input("Your question: ").strip()
+            question = input("❓ Your question: ").strip()
             
             if question.lower() in ['quit', 'exit', 'q']:
-                print("Goodbye!")
+                print("👋 Goodbye!")
                 break
             
             if not question:
@@ -121,7 +121,7 @@ def main():
             print_response(response)
             
         except KeyboardInterrupt:
-            print("\nGoodbye!")
+            print("\n👋 Goodbye!")
             break
         except Exception as e:
             print(f"Error: {e}")
