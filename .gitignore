@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environment variables (contains API keys)
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+cs_chatbot.log
+server.log
+hr_chatbot.log
+
+# FAISS index (regenerated from PDF)
+faiss_index/
+
+# Archives
+*.zip
+*.rar
+
+# Large data files (knowledge base PDF)
+data/*.pdf
+
+# Model cache
+models/
