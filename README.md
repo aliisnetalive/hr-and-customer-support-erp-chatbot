@@ -1,6 +1,19 @@
-# HR & Customer Support Chatbot — Egyptian ERP System
+# ERP RAG Chatbot — HR & Customer Support
 
-A production-ready RAG (Retrieval-Augmented Generation) chatbot that answers questions about the Egyptian ERP System by ingesting a comprehensive PDF manual, building a FAISS vector index, and using a local LLM (via LM Studio) to generate accurate, context-grounded responses. The application is deployed as a Flask REST API with Docker support and interactive testing clients.
+A production-ready **RAG (Retrieval-Augmented Generation)** chatbot for the **NOVAERP** Egyptian ERP System, serving both **HR** and **Customer Support** use cases. It ingests a comprehensive PDF manual, builds a FAISS vector index, and uses a local LLM (Llama 3.2 via LM Studio) to generate accurate, context-grounded responses — deployed as a Flask REST API with Docker support.
+
+---
+
+## Dual-Module Design
+
+This chatbot serves two roles within the NOVAERP system:
+
+| Module | Purpose | Queries |
+|--------|---------|---------|
+| **HR Chatbot** | Answers employee questions about ERP policies, leave, payroll, attendance, and internal procedures | *"How many annual leave days am I entitled to?"*, *"What is the overtime policy?"* |
+| **Customer Support** | Answers external customer questions about system features, account management, and troubleshooting | *"How do I reset my password?"*, *"Where can I find my invoice history?"* |
+
+Both modules share the same RAG pipeline, FAISS index, and Flask API — the only difference is the system prompt and context framing, which can be switched via environment configuration.
 
 ---
 
@@ -18,7 +31,7 @@ A production-ready RAG (Retrieval-Augmented Generation) chatbot that answers que
 ## Project Structure
 
 ```
-hr-erp-chatbot/
+erp-rag-chatbot/
 ├── README.md                                        # Project documentation
 ├── requirements.txt                                 # Python dependencies
 ├── .gitignore                                       # Git ignore rules
@@ -67,7 +80,23 @@ When a question arrives at `/ask`:
 4. **Generation** — LM Studio's local LLM generates the answer using the provided context.
 5. **Response** — The API returns the answer, source page numbers, processing time, and document count.
 
-### 3. Configuration System
+### 3. Architecture
+
+```
+User Question (HR or Customer Support)
+    ↓
+Flask API (/ask endpoint)
+    ↓
+FAISS Similarity Search → Top-K Relevant Chunks
+    ↓
+Prompt Construction (Context + Question)
+    ↓
+LM Studio LLM (Local llama-3.2-3b-instruct)
+    ↓
+Structured JSON Response
+```
+
+### 4. Configuration System
 
 All settings are managed through Pydantic models loaded from `.env`:
 
@@ -159,13 +188,13 @@ python main_app.py
 
 ```bash
 # Build
-docker build -t hr-erp-chatbot .
+docker build -t erp-rag-chatbot .
 
 # Run
 docker run -p 5000:5000 \
   -e FILE_PATH=Egyptian_ERP_System_Comprehensive_Manual.pdf \
   -v $(pwd):/app \
-  hr-erp-chatbot
+  erp-rag-chatbot
 
 # Or with docker-compose
 docker-compose up -d
@@ -238,6 +267,12 @@ LOG_LEVEL=INFO
 | **Configuration** | Pydantic 2.5 + python-dotenv |
 | **Containerization** | Docker + Docker Compose |
 | **Testing** | requests + custom test client |
+
+---
+
+## Part of NOVAERP
+
+This project is part of the **NOVAERP** system, serving as both the **HR Chatbot** and **Customer Support Chatbot** module. It is designed to answer employee and customer queries about the Egyptian ERP System by retrieving relevant information from the comprehensive manual and generating accurate, context-grounded responses.
 
 ---
 
